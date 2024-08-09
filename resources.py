@@ -7,7 +7,12 @@ api = Api(prefix='/api')
 
 parser = reqparse.RequestParser()
 
-
+parser.add_argument('id', type=int)
+parser.add_argument('b_title', type=str)
+parser.add_argument('b_author', type=str)
+parser.add_argument('description', type=str)
+parser.add_argument('link', type=str)
+parser.add_argument('b_section', type=str)
 
 book_materials_fields = {
   'id' : fields.Integer,
@@ -26,9 +31,10 @@ class BookMaterials(Resource):
     all_resources = Books.query.all()
     return all_resources
 
+  @auth_required
   def post(self):
     args = parser.parse_args()
-    book = Books(**args)
+    book = Books(id = args.id, b_title = args.b_title, b_author = args.b_author, description = args.description, link = args.link, b_section = args.b_section)
     db.session.add(book)
     db.session.commit()
     return {'message' : 'resources created'}, 200
