@@ -39,6 +39,7 @@ def create_app():
 
     #connect flask to flask_restful
     resources.api.init_app(app)
+    app.app_context().push()
     app.debug = True
     
     return app
