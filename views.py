@@ -1,5 +1,5 @@
 from flask import render_template_string, render_template, Flask, request, jsonify
-from flask_security import auth_required, current_user, roles_required
+from flask_security import auth_required, current_user, roles_required, verify_password
 from flask_security import SQLAlchemySessionUserDatastore
 from flask_security.utils import hash_password
 from application.database import db
@@ -11,13 +11,38 @@ def create_view(app : Flask, user_datastore : SQLAlchemySessionUserDatastore, db
     def home():
         return render_template('index.html') # entry point to vue frontend
 
+    @app.route('/user-login', methods=['POST'])
+    def user_login():
+
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+
+
+        if not email or not password:
+            return jsonify({'message' : 'not valid email or password'}), 404
+
+        user = user_datastore.find_user(email = email)
+
+        if not user:
+            return jsonify({'message' : 'invalid user'}), 404
+
+        if verify_password(password, user.password):
+            return jsonify({
+                'token' : user.get_auth_token(),
+                'role' : user.roles[0].name,
+                'id' : user.id,
+                'email' : user.email
+            }), 200
+
+
     # profile
     @app.route('/profile')
-    @auth_required('token', 'session')
+    @auth_required('token')
     def profile():
         return render_template_string(
             """
-                <h1> this is homepage </h1>
+                <h1> this is profile page </h1>
                 <p> Welcome, {{current_user.email}}</p>
                 <p> Role :  {{current_user.roles[0].description}}</p>
                 <p><a href="/logout">Logout</a></p>

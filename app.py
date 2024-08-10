@@ -2,7 +2,7 @@ from flask import Flask
 import views
 from application.database import db, security
 from application.create_initial_data import create_data
-import resources
+import book_resources
 import os
 
 app = None
@@ -17,6 +17,12 @@ def create_app():
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'should-not-be-exposed'
     app.config["SECURITY_PASSWORD_SALT"] = "salty-password"
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+
+
+    #configure token
+    app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authentication-Token'
+    app.config['SECURITY_TOKEN_MAX_AGE'] = 500 #1hr 
+    app.config['SECURITY_LOGIN_WITHOUT_CONFIRMATION'] = True
 
     db.init_app(app)
 
@@ -38,7 +44,7 @@ def create_app():
     views.create_view(app, user_datastore, db)
 
     #connect flask to flask_restful
-    resources.api.init_app(app)
+    book_resources.api.init_app(app)
     app.debug = True
     
     return app

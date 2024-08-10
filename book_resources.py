@@ -27,13 +27,13 @@ book_materials_fields = {
 
 # Define the BookMaterials resource
 class BookMaterials(Resource):
-    @auth_required()
+    @auth_required('token')
     @marshal_with(book_materials_fields)
     def get(self):
         all_resources = Books.query.all()
         return all_resources
 
-    @auth_required()
+    @auth_required('token')
     @marshal_with(book_materials_fields)
     def post(self):
         args = parser.parse_args()

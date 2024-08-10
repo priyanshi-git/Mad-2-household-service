@@ -34,6 +34,7 @@ const Login = {
         body : JSON.stringify({email : this.email, password : this.password}),
       });
         if (res.ok) {
+          store.commit("setLogin");
           router.push("/profile"); //add logic for lib vs stud
         } else {
           console.error("Login Failed");
