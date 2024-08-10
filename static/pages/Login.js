@@ -26,7 +26,7 @@ const Login = {
       
 
       const url = window.location.origin;
-      const res = await fetch(url+'/login', {
+      const res = await fetch(url+'/user-login', {
         method : 'POST',
         headers : {
           "Content-type" : "application/json",
@@ -34,8 +34,13 @@ const Login = {
         body : JSON.stringify({email : this.email, password : this.password}),
       });
         if (res.ok) {
-          store.commit("setLogin");
-          router.push("/profile"); //add logic for lib vs stud
+          const data = await res.json()
+          sessionStorage.setItem('token', data.token);
+          sessionStorage.setItem('role', data.role);
+          sessionStorage.setItem('email', data.email);
+          sessionStorage.setItem('id', data.id);
+
+          router.push("/dashboard"); //add logic for lib vs stud
         } else {
           console.error("Login Failed");
         }

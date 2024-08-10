@@ -6,8 +6,8 @@ const Navbar = {
   <router-link to='/'>Home</router-link>
   <router-link v-if="!loggedIn" to='/login'>Login</router-link>
   <router-link v-if="!loggedIn" to='/signup'>Signup</router-link>
-  <router-link v-if="loggedIn" to='/dashboard'>Dashboard</router-link>
-  <a v-if="loggedIn" :href="url">Logout</a>
+  <router-link to='/dashboard'>Dashboard</router-link>
+  <a :href="url">Logout</a>
   </nav>
   `,
   data(){

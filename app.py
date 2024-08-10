@@ -21,7 +21,7 @@ def create_app():
 
     #configure token
     app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authentication-Token'
-    app.config['SECURITY_TOKEN_MAX_AGE'] = 500 #1hr 
+    app.config['SECURITY_TOKEN_MAX_AGE'] = 3600 #1hr 
     app.config['SECURITY_LOGIN_WITHOUT_CONFIRMATION'] = True
 
     db.init_app(app)

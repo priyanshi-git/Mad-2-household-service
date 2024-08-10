@@ -34,6 +34,8 @@ def create_view(app : Flask, user_datastore : SQLAlchemySessionUserDatastore, db
                 'id' : user.id,
                 'email' : user.email
             }), 200
+        else:
+            return jsonify({'message' : 'wrong password'})
 
 
     # profile

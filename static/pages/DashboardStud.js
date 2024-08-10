@@ -13,9 +13,10 @@ const DashboardStud = {
     };
   },
   async mounted() {
-    const res = await fetch(window.location.origin + '/api/books')
+    const res = await fetch(window.location.origin + '/api/books', {
+      
+    });
     const data = await res.json();
-
     this.allResources = data;
   },
   components: { BookResource },
