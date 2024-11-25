@@ -1,5 +1,5 @@
 from flask import current_app as app
-from flask_security import auth_required, roles_required
+from flask_security import auth_required, roles_required, roles_accepted
 from flask_restful import fields, marshal
 from .models import User, db, Services, Role
 from flask import jsonify, request, render_template
@@ -146,7 +146,7 @@ def all_professionals():
 
 @app.get('/services')
 @auth_required("token")
-@roles_required("admin")
+@roles_accepted("admin", "user")
 def service_list():
     try:
         services = Services.query.all()

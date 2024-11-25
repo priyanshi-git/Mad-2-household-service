@@ -2,7 +2,7 @@ export default {
   template: `
   <div> 
   <! -- ------------------------------------------ SERVICE TABLE ----------------------------------------------------------- -->
-    <h2 class="headings" id="books">Services</h2>
+    <h2 class="headings" id="services">Services</h2>
     <div class="">
       <router-link to="/createservice">Add New Service</router-link>
     </div>
@@ -180,7 +180,6 @@ export default {
           alert(`Error: ${errorData.message}`);
         }
       }
-    }
-    ,
+    },
   },
 };
