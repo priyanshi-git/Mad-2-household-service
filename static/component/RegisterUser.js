@@ -1,12 +1,10 @@
-import router from "../utils/router.js";
-
-const Signup = {
+export default {
   template: `
     <div class="d-flex justify-content-center align-items-center vh-100">
-      <div class="card shadow p-4">
-        <h3 class="card-title text-center mb-4">Sign Up</h3>
+      <div class="card shadow p-5">
+        <h3 class="card-title text-center mb-4">User Sign Up</h3>
         <div class="form-group mb-3">
-          <input v-model="name" type="name" class="form-control" placeholder="Name" required/>
+          <input v-model="name" type="fullname" class="form-control" placeholder="Name" required/>
         </div>
         <div class="form-group mb-3">
           <input v-model="email" type="email" class="form-control" placeholder="Email" required/>
@@ -14,52 +12,53 @@ const Signup = {
         <div class="form-group mb-4">
           <input v-model="password" type="password" class="form-control" placeholder="Password" required/>
         </div>
-        <div class="form-group mb-4">
-          <select v-model="role" class="form-control">
-            <option value="genuser">General User</option>
-          </select>
+        <div class="form-group mb-3">
+          <input v-model="pincode" type="pincode" class="form-control" placeholder="Pincode" required/>
         </div>
-        <button class="btn btn-primary w-100" @click="submitInfo">Submit</button>
+        <button class="btn btn-primary w-100" @click="register">Register</button>
+        <div class="text-danger">{{ error }}</div>
       </div>
     </div>
   `,
   data() {
     return {
       email: "",
+      name: "",
       password: "",
-      role: "",
+      pincode: "",
+      role: "user",
+      error: null,
     };
   },
   methods: {
-    async submitInfo() {
+    async register() {
       const origin = window.location.origin;
-      const url = `${origin}/register`;
+      const url = `${origin}/registeruser`;
       const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: this.name,
           email: this.email,
+          name: this.name,
           password: this.password,
+          pincode: this.pincode,
           role: this.role,
         }),
         credentials: "same-origin",
       });
 
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
         console.log(data);
         // Handle successful sign up, e.g., redirect or store token
-        router.push("/login");
+        this.$router.push({path: '/'})
       } else {
-        const errorData = await res.json();
-        console.error("Sign up failed:", errorData);
+        this.error = data.message
         // Handle sign up error
       }
     },
   },
 };
 
-export default Signup;
