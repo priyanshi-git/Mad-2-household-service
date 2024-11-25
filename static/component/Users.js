@@ -26,7 +26,7 @@ export default {
     },
   },
   async mounted(){
-    const res = await fetch('/users', {
+    const res = await fetch('/get_users', {
       headers: {
         "Authentication-Token": this.token,
       },

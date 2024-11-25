@@ -72,7 +72,7 @@ def register():
     return jsonify({"message" : "User already exists"}), 400
   
   if role == "user":
-    active = False
+    active = True
   try:
     datastore.create_user(email = email, name = name, password = generate_password_hash(password), pincode = pincode, roles=[role], active=active)
     db.session.commit()
@@ -126,7 +126,7 @@ user_fields = {
 @auth_required("token")
 @roles_required("admin")
 def all_users():
-  users = User.query.filter(User.roles.contains('user')).all()
+  users = User.query.filter(User.roles.any(Role.name == "user")).all()
   if len(users) == 0:
     return jsonify({"message": "No User Found"}), 404
   return marshal(users, user_fields)

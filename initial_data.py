@@ -14,7 +14,7 @@ with app.app_context():
   if not datastore.find_user(email="admin@iitm.ac.in"):
     datastore.create_user(email="admin@iitm.ac.in", password=generate_password_hash('adminpass'), roles=['admin'])
   if not datastore.find_user(email="user1@iitm.ac.in"):
-    datastore.create_user(email="user1@iitm.ac.in", password=generate_password_hash('user1pass'), pincode="110033", name="user1", roles=['user'], active=False)
+    datastore.create_user(email="user1@iitm.ac.in", password=generate_password_hash('user1pass'), pincode="110033", name="user1", roles=['user'], active=True)
   if not datastore.find_user(email="professional@iitm.ac.in"):
     datastore.create_user(email="professional@iitm.ac.in", password=generate_password_hash('professionalpass'), pincode="110033", service="Plumbing", experience="1", name="professional 1", roles=['professional'], active=False)
   
