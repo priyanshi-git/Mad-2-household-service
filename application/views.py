@@ -102,7 +102,7 @@ def registerp():
     return jsonify({"message" : "User already exists"}), 400
   
   if role == "professional":
-    active = True
+    active = False
   try:
     datastore.create_user(email = email, name = name, password = generate_password_hash(password), pincode = pincode, roles=[role], service=service, experience=experience, active=active)
     db.session.commit()
@@ -136,10 +136,12 @@ def all_users():
 @auth_required("token")
 @roles_required("admin")
 def all_professionals():
-  users = User.query.filter(User.roles.any(Role.name == "professional")).all()
-  if len(users) == 0:
-    return jsonify({"message": "No User Found"}), 404
-  return marshal(users, user_fields)
+  try: 
+    users = User.query.filter(User.roles.any(Role.name == "professional")).all()
+    user_data = [{'id': user.id, 'name': user.name, 'active': user.active, 'experience': user.experience, 'service': user.service} for user in users]
+    return user_data, 200
+  except Exception as e:
+      return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
 
 
 @app.get('/services')
@@ -187,6 +189,23 @@ def delete_service(service_id):
             db.session.delete(service)
             db.session.commit()
             return jsonify({'message': 'Section deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of error
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+
+@app.delete('/delete/professional/<int:user_id>')
+@auth_required("token")
+@roles_required("admin")
+def delete_prof(user_id):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+          return jsonify({'message':'User not found'}),404
+        else:
+            db.session.delete(user)
+            db.session.commit()
+            return jsonify({'message': 'User deleted successfully'}), 200
     except Exception as e:
         db.session.rollback()  # Rollback in case of error
         return jsonify({'message': 'An error occurred', 'error': str(e)}), 500

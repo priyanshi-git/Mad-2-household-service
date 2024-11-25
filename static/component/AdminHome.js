@@ -40,7 +40,7 @@ export default {
   <! -- --------------------------------------- PROFESSIONAL TABLE --------------------------------------------------------- -->
 
   <h2 class="headings" id="books">Professionals</h2>
-    <div v-if="professionals === []">
+    <div v-if="professionals.length === 0">
       <h4>No Professionals Available.</h4>
     </div>
     <div v-else>
@@ -60,7 +60,11 @@ export default {
             <td>{{ prof.name }}</td>
             <td>{{ prof.experience }}</td>
             <td>{{ prof.service }}</td>
-            
+            <td>
+              <button class="btn btn-primary" v-if='!prof.active' @click="approve(prof.id)"> Approve </button>
+              <button v-if='!prof.active' type="button" class="btn btn-danger" @click="deleteProf(prof.id)">Reject</button>
+              <button v-if='prof.active' type="button" class="btn btn-danger" @click="deleteProf(prof.id)">Delete</button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -132,5 +136,51 @@ export default {
         }
       }
     },
+
+    async approve(userID) {
+      const res = await fetch(`/activate/user/${userID}`, {
+        headers: {
+          "Authentication-Token": this.token,
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+    
+        // Update the `active` status of the approved professional
+        const professional = this.professionals.find((prof) => prof.id === userID);
+        if (professional) {
+          professional.active = true; // Update the status to active
+        }
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    },
+
+    async deleteProf(profID) {
+      if (confirm("Are you sure you want to delete this professional?")) {
+        const res = await fetch(`/delete/professional/${profID}`, {
+          method: "DELETE",
+          headers: {
+            "Authentication-Token": this.token,
+            "Content-Type": "application/json",
+          },
+        });
+    
+        if (res.ok) {
+          const data = await res.json();
+          alert(data.message);
+    
+          // Remove the professional from the list
+          this.professionals = this.professionals.filter(
+            (prof) => prof.id !== profID
+          );
+        } else {
+          const errorData = await res.json();
+          alert(`Error: ${errorData.message}`);
+        }
+      }
+    }
+    ,
   },
 };
