@@ -311,8 +311,8 @@ def book_service(service_id):
         new_request = ServiceReq(
             service_id=service_id,
             professional_id=professional_id,
-            service_status="pending",
-            user_status="requested",
+            service_status="Pending",
+            user_status="Requested",
             user_id=user.id,
             date_of_request=datetime.now().strftime('%Y-%m-%d'),
             date_of_completion="",
@@ -349,7 +349,7 @@ def get_user_service_requests():
                 "service_name": request.Services.name,
                 "professional_name": request.User.name,
                 "date_requested": request.ServiceReq.date_of_request,
-                "service_status": request.ServiceReq.service_status,
+                "user_status": request.ServiceReq.user_status,
             }
             for request in service_requests
         ]

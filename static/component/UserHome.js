@@ -54,7 +54,7 @@ export default {
             <td>{{ req.service_name }}</td>
             <td>{{ req.professional_name }}</td>
             <td>{{ req.date_requested }}</td>
-            <td>{{ req.service_status }}</td>
+            <td>{{ req.user_status }}</td>
           </tr>
         </tbody>
       </table>

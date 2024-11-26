@@ -1,7 +1,7 @@
 export default {
   template: `
   <div>
-    <h2 class="headings" id="professionals">Professionals for {{ serviceName }}</h2>
+    <h2 class="headings" id="professionals">List of Providers</h2>
     <div v-if="professionals.length === 0">
       <h4>No Professionals Available.</h4>
     </div>
@@ -35,7 +35,6 @@ export default {
   data() {
     return {
       professionals: [],
-      serviceName: "",
       token: localStorage.getItem('auth-token'),
     };
   },
@@ -77,7 +76,6 @@ export default {
     if (response.ok) {
       const data = await response.json();
       this.professionals = data;
-      this.serviceName = data.length > 0 ? data[0].service_name : "Unknown Service";
     } else {
       alert('Error fetching professionals');
     }
