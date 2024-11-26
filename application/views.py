@@ -314,7 +314,7 @@ def book_service(service_id):
             service_status="pending",
             user_status="requested",
             user_id=user.id,
-            date_of_request=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            date_of_request=datetime.now().strftime('%Y-%m-%d'),
             date_of_completion="",
             remarks="",
         )
@@ -325,5 +325,38 @@ def book_service(service_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+@app.get('/user/service-requests')
+@auth_required("token")
+@roles_accepted("user")
+def get_user_service_requests():
+    try:
+        # Get the authenticated user
+        user = current_user
+
+        # Query the ServiceReq table for the logged-in user's service requests
+        service_requests = (
+            db.session.query(ServiceReq, Services, User)
+            .join(Services, ServiceReq.service_id == Services.id)
+            .join(User, ServiceReq.professional_id == User.id)
+            .filter(ServiceReq.user_id == user.id)
+            .all()
+        )
+
+        # Format the results
+        result = [
+            {
+                "service_name": request.Services.name,
+                "professional_name": request.User.name,
+                "date_requested": request.ServiceReq.date_of_request,
+                "service_status": request.ServiceReq.service_status,
+            }
+            for request in service_requests
+        ]
+
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
 
 

@@ -33,8 +33,8 @@ export default {
   <! -- ------------------------------------------ SERVICE TABLE ----------------------------------------------------------- -->
   <! -- ------------------------------------------ HISTORY TABLE ----------------------------------------------------------- -->
 
-    <h2 class="headings" id="services">Service History</h2>
-    <div v-if="services.length === 0">
+    <h2 class="headings" id="requests">Service History</h2>
+    <div v-if="reqs.length === 0">
       <h4>No Services Requests.</h4>
     </div>
     <div v-else>
@@ -49,14 +49,12 @@ export default {
           </tr>
         </thead>
         <tbody class="table-group-divider">
-          <tr v-for="(service, index) in services" :key="service.id">
+          <tr v-for="(req, index) in reqs" :key="req.id">
             <th scope="row">{{ index+1 }}</th>
-            <td>{{ service.name }}</td>
-            <td>{{ service.description }}</td>
-            <td>{{ service.price }}</td>
-            <td>
-              <router-link :to="'/service/' + service.id + '/professionals'" class="btn btn-primary">View Providers</router-link>
-            </td>
+            <td>{{ req.service_name }}</td>
+            <td>{{ req.professional_name }}</td>
+            <td>{{ req.date_requested }}</td>
+            <td>{{ req.service_status }}</td>
           </tr>
         </tbody>
       </table>
@@ -67,7 +65,7 @@ export default {
   data() {
     return {
       services: null,
-      professionals: null,
+      reqs: null,
       token: localStorage.getItem('auth-token'),
       role: localStorage.getItem('role'),
       error: null,
@@ -86,6 +84,19 @@ export default {
       this.services = s_data;
     } else {
       this.error = s_response.status;
+    }
+
+    const r_response = await fetch('/user/service-requests', {
+      method: 'GET',
+      headers: {
+        'Authentication-Token': this.token,
+      },
+    });
+    const r_data = await r_response.json().catch((e) => {});
+    if (r_response.ok) {
+      this.reqs = r_data;
+    } else {
+      this.error = r_response.status;
     }
   },
 };
