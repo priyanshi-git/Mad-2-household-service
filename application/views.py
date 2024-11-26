@@ -1,10 +1,12 @@
 from flask import current_app as app
 from flask_security import auth_required, roles_required, roles_accepted
+from flask_login import current_user
 from flask_restful import fields, marshal
-from .models import User, db, Services, Role
+from .models import User, db, Services, Role, ServiceReq
 from flask import jsonify, request, render_template
 from .sec import datastore
 from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
 
 @app.get('/')
 def home():
@@ -247,3 +249,81 @@ def edit_service(service_id):
   except Exception as e:
     db.session.rollback()
     return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+@app.get('/service/<int:service_id>/professionals')
+@auth_required("token")
+@roles_accepted("user")
+def get_service_professionals(service_id):
+    try:
+        # Ensure the service exists
+        service = Services.query.get(service_id)
+        if not service:
+            return jsonify({'message': 'Service not found'}), 404
+
+        # Find professionals associated with the service
+        professionals = User.query.filter(
+            User.service == service.name,  # Match service name
+            User.active == True  # Only active professionals
+        ).all()
+
+        # Serialize the data
+        professionals_data = [
+            {
+                'id': prof.id,
+                'name': prof.name,
+                'experience': prof.experience,
+                'email': prof.email
+            }
+            for prof in professionals
+        ]
+
+        return jsonify(professionals_data), 200
+    except Exception as e:
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+
+
+
+@app.post('/service/<int:service_id>/book')
+@auth_required("token")
+@roles_accepted("user")
+def book_service(service_id):
+    try:
+        # Validate that the service exists
+        service = Services.query.get(service_id)
+        if not service:
+            return jsonify({'message': 'Service not found'}), 404
+
+        # Get the authenticated user
+        user = current_user
+
+        # Parse request data for professional ID
+        data = request.json
+        professional_id = data.get("professional_id")
+
+
+        # Check if the user already has a pending request for the service
+        existing_request = ServiceReq.query.filter_by(service_id=service_id, user_id=user.id, service_status='pending').first()
+        if existing_request:
+            return jsonify({'message': 'You already have a pending request for this service.'}), 400
+
+        # Create a new service request
+        new_request = ServiceReq(
+            service_id=service_id,
+            professional_id=professional_id,
+            service_status="pending",
+            user_status="requested",
+            user_id=user.id,
+            date_of_request=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            date_of_completion="",
+            remarks="",
+        )
+        db.session.add(new_request)
+        db.session.commit()
+
+        return jsonify({'message': 'Service booked successfully!'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+

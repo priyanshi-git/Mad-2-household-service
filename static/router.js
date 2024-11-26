@@ -5,6 +5,7 @@ import RegisterUser from './component/RegisterUser.js'
 import RegisterProfessional from './component/RegisterProfessional.js'
 import ServiceResourceForm from './component/ServiceResourceForm.js'
 import EditService from './component/EditService.js'
+import ServiceProfessionals from './component/ServiceProfessionals.js';
 
 const routes = [
   {path:'/', component: Home, name: "Home"},
@@ -14,6 +15,7 @@ const routes = [
   { path : '/registerprofessional', component : RegisterProfessional },
   { path : '/createservice', component : ServiceResourceForm },
   { path : '/editservice/:service_id', component : EditService },
+  { path: '/service/:id/professionals', component: ServiceProfessionals },
 ]
 
 export default new VueRouter({
