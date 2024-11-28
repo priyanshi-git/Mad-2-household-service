@@ -52,8 +52,8 @@ class ServiceReq(db.Model):
   service_id = db.Column(db.Integer, db.ForeignKey('service.id'), nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
   professional_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) #nullable until assigned to a professional
-  service_status = db.Column(db.String, default='Pending', nullable=False)
-  user_status = db.Column(db.String, default='Requested', nullable=False)
+  service_status = db.Column(db.String, default='Pending', nullable=False) #pending, accepted, rejected, closed
+  user_status = db.Column(db.String, default='Requested', nullable=False) #requested, ongoing (close button) --> closed, rejected
   date_of_request = db.Column(db.String, nullable=False)
   date_of_completion = db.Column(db.String, nullable=False)
   remarks = db.Column(db.String)

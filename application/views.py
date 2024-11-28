@@ -346,6 +346,7 @@ def get_user_service_requests():
         # Format the results
         result = [
             {
+                "id": request.ServiceReq.id,
                 "service_name": request.Services.name,
                 "professional_name": request.User.name,
                 "date_requested": request.ServiceReq.date_of_request,
@@ -358,5 +359,77 @@ def get_user_service_requests():
     except Exception as e:
         return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
 
+
+@app.get('/professional/service-requests')
+@auth_required("token")  
+@roles_accepted("professional")  
+def get_professional_service_requests():
+    try:
+        
+        professional = current_user
+
+        
+        service_requests = (
+            db.session.query(ServiceReq, User)
+            .join(User, ServiceReq.user_id == User.id)  
+            .filter(ServiceReq.professional_id == professional.id) 
+            .all()
+        )
+
+        # Format the results
+        result = [
+            {
+                "id": request.ServiceReq.id,
+                "customer_name": request.User.name,
+                "date_requested": request.ServiceReq.date_of_request,
+                "pincode": request.User.pincode,
+                "service_status": request.ServiceReq.service_status
+            }
+            for request in service_requests
+        ]
+
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+
+@app.put('/close/<int:servicereq_id>')
+@auth_required('token')
+@roles_accepted('professional', 'user')
+def reject_service(servicereq_id):
+    # Fetch the service request and update the status
+    servicereq = ServiceReq.query.get(servicereq_id)
+    if not servicereq:
+        return jsonify({'message': 'Service not found'}), 404
+
+    servicereq.service_status = "Closed"
+    servicereq.user_status = "Closed"
+
+    try:
+        db.session.commit()
+        return jsonify({"message": "Service Closed"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+
+@app.put('/accept/<int:servicereq_id>')
+@auth_required('token')
+@roles_required('professional')
+def accept_service(servicereq_id):
+    # Fetch the service request and update the status
+    servicereq = ServiceReq.query.get(servicereq_id)
+    if not servicereq:
+        return jsonify({'message': 'Service not found'}), 404
+
+    servicereq.service_status = "Ongoing"
+    servicereq.user_status = "Ongoing"
+
+    try:
+        db.session.commit()
+        return jsonify({"message": "Service Accepted"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
 
 

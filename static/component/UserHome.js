@@ -54,7 +54,14 @@ export default {
             <td>{{ req.service_name }}</td>
             <td>{{ req.professional_name }}</td>
             <td>{{ req.date_requested }}</td>
-            <td>{{ req.user_status }}</td>
+            <td>
+              <div v-if="req.user_status == 'Requested' || req.user_status == 'Closed'">
+                {{ req.user_status }}
+              </div>
+              <div v-else>
+                <button type="button" class="btn btn-primary" @click="closeService(req.id)">Close it ?</button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -98,5 +105,29 @@ export default {
     } else {
       this.error = r_response.status;
     }
+  },
+
+  methods: {
+    async closeService(reqID) {
+      const response = await fetch(`/close/${reqID}`, {
+        method: "PUT",
+        headers: {
+          "Authentication-Token": this.token,
+        },
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+
+        // Dynamically update the local reqs array
+        const reqIndex = this.reqs.findIndex((req) => req.id === reqID);
+        if (reqIndex !== -1) {
+          this.reqs[reqIndex].user_status = "Closed";
+        }
+      } else {
+        alert(`Failed to reject the service: ${data.message}`);
+      }
+    },
   },
 };
