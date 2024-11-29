@@ -33,7 +33,7 @@ celery_app.conf.enable_utc = False  # Disable UTC if you're using local time
 def send_email(sender, **kwargs):
     sender.add_periodic_task(
         crontab(minute='*/1'),
-        daily_reminder.s('Happy Monday!'),
+        daily_reminder.s("vishal@iitm.in", 'Happy Monday!'),
     )
 
 if __name__ == "__main__":

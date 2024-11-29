@@ -11,10 +11,12 @@ SENDER_PASSOWRD = ""
 
 def send_message(to, subject, content_body):
   msg = MIMEMultipart()
-  msg['to']=to
-  msg["subject"]=subject
-  msg["from"]=SENDER_EMAIL
+  msg['To']=to
+  msg['Subject']=subject
+  msg['From']=SENDER_EMAIL
   msg.attach(MIMEText(content_body, 'html'))
   client = SMTP(host=SMTP_HOST, port=SMTP_PORT)
   client.send_message(msg=msg)
   client.quit()
+
+send_message("vishal@iitm.in", "test", '<html>TEST</html>')
