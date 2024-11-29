@@ -70,6 +70,35 @@ export default {
       </table>
     </div>
 
+  <! -- ------------------------------------------ HISTORY TABLE ----------------------------------------------------------- -->
+
+    <h2 class="headings" id="requests">Service History</h2>
+    <div v-if="reqs.length === 0">
+      <h4>No Services Requests.</h4>
+    </div>
+    <div v-else>
+      <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="row">S. No.</th>
+            <th scope="col">Service Name</th>
+            <th scope="col">Professional Name</th>
+            <th scope="col">Date Requested</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          <tr v-for="(req, index) in reqs" :key="req.id">
+            <th scope="row">{{ index+1 }}</th>
+            <td>{{ req.service_name }}</td>
+            <td>{{ req.professional_name }}</td>
+            <td>{{ req.date_requested }}</td>
+            <td>{{ req.service_status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>`,
 
   data() {
@@ -79,6 +108,7 @@ export default {
       token: localStorage.getItem('auth-token'),
       role: localStorage.getItem('role'),
       error: null,
+      reqs: null
     };
   },
 
@@ -107,6 +137,19 @@ export default {
       this.professionals = p_data;
     } else {
       this.error = p_response.status;
+    }
+
+    const r_response = await fetch('/all-service-requests', {
+      method: 'GET',
+      headers: {
+        'Authentication-Token': this.token,
+      },
+    });
+    const r_data = await r_response.json().catch((e) => {});
+    if (r_response.ok) {
+      this.reqs = r_data;
+    } else {
+      this.error = r_response.status;
     }
 
   },

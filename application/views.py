@@ -7,6 +7,7 @@ from flask import jsonify, request, render_template
 from .sec import datastore
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from sqlalchemy.orm import aliased
 
 @app.get('/')
 def home():
@@ -351,6 +352,7 @@ def get_user_service_requests():
                 "professional_name": request.User.name,
                 "date_requested": request.ServiceReq.date_of_request,
                 "user_status": request.ServiceReq.user_status,
+                "service_status": request.ServiceReq.service_status
             }
             for request in service_requests
         ]
@@ -430,6 +432,51 @@ def accept_service(servicereq_id):
         return jsonify({"message": "Service Accepted"}), 200
     except Exception as e:
         db.session.rollback()
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+
+
+
+@app.get('/all-service-requests')
+@auth_required("token")
+@roles_accepted("admin")
+def get_all_service_requests():
+    try:
+        # Alias the User table for clarity
+        Customer = aliased(User)  # Alias for the customer
+        Professional = aliased(User)  # Alias for the professional
+
+        # Query the ServiceReq table with aliased joins
+        service_requests = (
+            db.session.query(
+                ServiceReq.id.label("id"),
+                Services.name.label("service_name"),
+                Customer.name.label("customer_name"),
+                Professional.name.label("professional_name"),
+                ServiceReq.date_of_request.label("date_requested"),
+                ServiceReq.service_status.label("service_status"),
+            )
+            .join(Services, ServiceReq.service_id == Services.id)
+            .join(Customer, ServiceReq.user_id == Customer.id)
+            .outerjoin(Professional, ServiceReq.professional_id == Professional.id)
+            .all()
+        )
+
+        # Format the results
+        result = [
+            {
+                "id": req.id,
+                "service_name": req.service_name,
+                "customer_name": req.customer_name,
+                "professional_name": req.professional_name or "Not Assigned",
+                "date_requested": req.date_requested,
+                "service_status": req.service_status,
+            }
+            for req in service_requests
+        ]
+
+        return jsonify(result), 200
+    except Exception as e:
         return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
 
 

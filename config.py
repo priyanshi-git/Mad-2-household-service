@@ -12,3 +12,4 @@ class DevelopmentConfig(Config):
   SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS=True
   WTF_CSRF_ENABLED=False
   SECURITY_TOKEN_AUTHENTICATION_HEADER = 'Authentication-Token'
+  
