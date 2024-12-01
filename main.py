@@ -7,7 +7,8 @@ from application.sec import datastore
 from application.worker import celery_init_app
 from celery import Celery
 from celery.schedules import crontab
-from application.tasks import daily_reminder
+from application.tasks import daily_reminder, notify_professionals, monthly_service_report
+from application.instances import cache
 
 def create_app():
   app = Flask(__name__)
@@ -16,6 +17,7 @@ def create_app():
   api.init_app(app)
   
   app.security = Security(app, datastore)
+  cache.init_app(app)
   with app.app_context():
     import application.views
 
@@ -33,7 +35,7 @@ celery_app.conf.enable_utc = False  # Disable UTC if you're using local time
 def send_email(sender, **kwargs):
     sender.add_periodic_task(
         crontab(minute='*/1'),
-        daily_reminder.s("vishal@iitm.in", 'Happy Monday!'),
+        monthly_service_report.s(),
     )
 
 if __name__ == "__main__":

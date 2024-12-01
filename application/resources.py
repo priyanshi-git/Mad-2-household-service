@@ -2,6 +2,7 @@ from flask_restful import Resource, Api, reqparse, marshal_with, fields
 from flask_security import auth_required, roles_required, current_user
 from flask import jsonify
 from .models import Services, db
+from .instances import cache
 
 api = Api(prefix='/api')
 
@@ -42,6 +43,7 @@ class Service_Resource(Resource):
 
     @auth_required("token")
     @roles_required("admin")
+    @cache.cached(timeout=50)
     def post(self):
         args = service_parser.parse_args()  # Using service_parser here
         service = Services(id=args.get("id"), name=args.get("name"), description=args.get("description"), price=args.get("price"))

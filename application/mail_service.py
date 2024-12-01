@@ -18,5 +18,3 @@ def send_message(to, subject, content_body):
   client = SMTP(host=SMTP_HOST, port=SMTP_PORT)
   client.send_message(msg=msg)
   client.quit()
-
-send_message("vishal@iitm.in", "test", '<html>TEST</html>')
