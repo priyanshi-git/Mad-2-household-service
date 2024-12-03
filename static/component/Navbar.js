@@ -15,7 +15,7 @@ export default {
           <router-link class="nav-link active" aria-current="page" to="/">Home</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/users">User</router-link>
+          <router-link class="nav-link" to="/users"></router-link>
         </li>
         <li class="nav-item text-end" v-if='is_login'>
           <button class="nav-link" aria-current="page" @click='logout' href="#"> Logout</button>
@@ -25,17 +25,17 @@ export default {
   </div>
 </nav>
   `,
-  data(){
+  data() {
     return {
-      role: localStorage.getItem('role'),
-      is_login: localStorage.getItem('auth-token'),
-    }
+      role: localStorage.getItem("role"),
+      is_login: localStorage.getItem("auth-token"),
+    };
   },
   methods: {
-    logout(){
-      localStorage.removeItem('auth-token')
-      localStorage.removeItem('role')
-      this.$router.push({path: '/login'})
+    logout() {
+      localStorage.removeItem("auth-token");
+      localStorage.removeItem("role");
+      this.$router.push({ path: "/login" });
     },
   },
-}
+};
